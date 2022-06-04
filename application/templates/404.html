@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block page %}
+<div class="row row-col-1 row-cols-md-3 g-4">
+    <div class="col">
+        <b>404</b>
+        <h1>Página não encontrada</h1>
+        <p>Desculpa, a página que você busca não existe</p>
+        <a href="{{ url_for('admin.painel')}}">Admin </a>/Login
+    </div>
+</div>
+{% endblock %}
