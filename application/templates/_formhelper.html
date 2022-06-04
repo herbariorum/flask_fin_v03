@@ -1,0 +1,22 @@
+{% macro render_field_required(field, css) %}
+<div class="{{ css }}">
+    {{field.label(class='form-label')}}<span class="text-danger">*</span>
+    <div class="input-group has-validation">
+        {{ field(**kwargs)|safe }}
+        {% if field.errors %}
+            {% for error in field.errors  %}
+            <div class="invalid-feedback is-invalid" >{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro render_field(field, css) %}
+<div class="{{ css }}">
+    {{field.label(class='form-label')}}</span>
+    <div class="input-group has-validation">
+        {{ field(**kwargs)|safe }}
+    </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}Finance{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('admin.painel')}}">Painel </a>
+{% endblock %}
+
+{% block page %}
+<div class="row row-col-1 row-cols-md-3 g-4">
+    <div class="col">
+        <div class="card h-100" style="width: 18rem;" >
+            <div class="card-header">
+                Cadastro de Usuário
+            </div>
+            <div class="card-body">                            
+                <p class="card-text">
+                    O botão abaixo permite cadastrar um novo usuário.
+                    Use-o com cuidado.
+                </p>
+                <a href="{{ url_for('auth.register')}}" class="btn btn-primary">Cadastrar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

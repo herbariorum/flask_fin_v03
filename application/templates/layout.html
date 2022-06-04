@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/painel.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/alert.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css')}}">
+    {% block head %}{% endblock %}
+</head>
+<title>{% block title %}{{ title }}{% endblock %}</title>
+<main>
+    <header>
+        <div class="branding">
+            <img src="{{ url_for('static', filename='images/License_icon-mit-88x31-2.svg')}}" alt="">
+        </div>
+        <div class="page-details">
+            <div class="title-icon"><span class="material-icons indicador">
+                chevron_right
+                </span>{% block breadcrumb %}{% endblock %}</div>
+        </div>
+        <div class="settings">
+            <div class="profile">       
+                {% if session['user_id'] %}
+                <a href="{{ url_for('admin.profile') }}" style="display: flex;margin-right: 50px;">
+                    <i class="material-icons">person</i>
+                    {{ session['username'] }}
+                </a>
+                {% else %}
+
+                {% endif %}
+            </div>           
+        </div>
+    </header>
+    <app>
+        <nav>
+            <ul>                
+                {% if session['user_id'] %}
+                <li>
+                    <a href="{{ url_for('admin.painel')}}"><i class="material-icons">home</i><span>Início</span></a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.aluno')}}"><i class="material-icons">person</i><span>Alunos</span></a>
+                </li>
+                <li>
+                    <a href="{{ url_for('admin.responsavel')}}"><i class="material-icons">supervisor_account</i><span>Responsável</span></a>
+                </li>
+                <li>
+                    <a href="{{ url_for('auth.logout')}}"><i class="material-icons">logout</i><span>Sair</span></a>
+                </li>
+                {% else %}
+                <li>
+                    <a href="{{ url_for('auth.login')}}"><i class="material-icons">login</i><span>Login</span></a>
+                </li> 
+                {% endif %}                
+                
+            </ul>
+        </nav>  
+        <article>
+            <!-- Mensagens flashes -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}        
+                    {% for category, message in messages %}
+                    <div class="alert {{ category }}">
+                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                        <strong class="titulo_msg">{{ category|capitalize }}! </strong> {{ message }}
+                    </div> 
+                    {% endfor %}   
+                {% endif %}
+            {% endwith %}
+            <!-- Conteúdo dá página -->
+            {% block page %}
+            {% endblock%}    
+        </article>        
+    </app>
+</main>
+
+
+{% block script %}
+<script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js')}}"></script>
+
+<script>
+    setTimeout(function(){
+        $(".alert").hide()
+    }, 2000);
+</script>
+{% endblock%}

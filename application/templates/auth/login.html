@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required %}
+
+{% block title %}Finance{% endblock %}
+
+{% block breadcrumb %}
+Painel
+{% endblock %}
+
+{% block page %}  
+    <div class="col-md-6 offset-md-3">
+        <span class="material-icons account offset-md-5">account_circle</span>
+        <form class="row g-3 needs-validation" method="post" novalidate>
+            {{ form.csrf_token() }}
+            {{ render_field_required(form.email, 'mb-3', class='form-control')}}
+            {{ render_field_required(form.password_hash, 'mb-3', class='form-control')}}
+            <div class="mb-3">
+                {{ form.submit(class='btn btn-success')}}
+            </div>            
+        </form>
+    </div>
+    
+{% endblock %}
