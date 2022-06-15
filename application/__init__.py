@@ -2,6 +2,9 @@
 
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
+from .filter.filter import cpffilter, format_strit_to_data
 
 
 def page_not_found(e):
@@ -11,12 +14,18 @@ def method_not_allowed(e):
     return render_template('405.html'), 405
 
 db = SQLAlchemy()
+mg = Migrate()
 
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
     app.config.from_pyfile('../config.py')
 
+    app.add_template_filter(cpffilter)
+    app.add_template_filter(format_strit_to_data)
+
     db.init_app(app)
+    mg.init_app(app, db)
+
     from application.admin.views import admin
     from application.auth.views import auth
     from application.aluno.views import aluno

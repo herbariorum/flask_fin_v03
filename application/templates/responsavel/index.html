@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required, render_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('admin.painel')}}">Admin</a>/Responsavel
+{% endblock %}
+
+{% block page %}  
+<div class="col-md-12 ">
+    <form class="needs-validation row g-3  align-items-center" method="post" novalidate>
+        {{form.csrf_token() }}
+        {{ render_field_required(form.nome, 'col-sm-6',class='form-control form-control-sm')}}
+        {{ render_field_required(form.cpf, 'col-sm-3',class='form-control form-control-sm')}}
+        {{ render_field(form.email, 'col-sm-3',class='form-control form-control-sm')}}
+        {{ render_field(form.sexo, 'col-sm-3',class='form-control form-control-sm')}}
+        {{ render_field(form.tipo_responsavel, 'col-sm-3',class='form-control form-control-sm')}}
+        {{ render_field(form.profissao, 'col-sm-6',class='form-control form-control-sm')}}
+        {{ render_field(form.endereco, 'col-sm-8',class='form-control form-control-sm')}}
+        {{ render_field(form.contato, 'col-sm-4',class='form-control form-control-sm')}}
+        <div class="mb-3">
+            {{ form.submit(class='btn btn-success')}}
+        </div>  
+    </form>
+{% endblock %}

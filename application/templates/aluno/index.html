@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aluno.css')}}">
+{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('admin.painel')}}">Admin</a>/Aluno
+{% endblock %}
+
+
+{% block page %}  
+    <table id="data" class="table table-hover">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>NOME</th>
+                <th>CPF</th>
+                <th>DATA NASCIMENTO</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    <td>{{row.id}}</td>
+                    <td><a href="{{ url_for('aluno.view', id=row.id)}}">{{row.nome|title}}</a></td>
+                    <td>{{ row.cpf }}</td>
+                    <td>{{ row.nascimento.strftime('%d/%m/%Y') }}</td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
+
+    <script>
+        $('#data').DataTable({
+            rowReorder: true,
+            columnDefs: [
+                { orderable: true, className: 'reorder', targets: 0 }, //permite ordenar a coluna 0
+                { orderable: true, className: 'reorder', targets: 1 },
+                { orderable: false, targets: '_all' },  // desativa ordenar coluna em todas as outras
+                {
+                    target:3,
+                    searchable: false,
+                },
+                {
+                    target:4,
+                    searchable: false,
+                },
+            
+                {
+                    target:0,
+                    width: 10
+                }
+            ],
+            dom: '<"toolbar">frtip'
+        }); // FIM DATATABLE
+
+        $('div.toolbar').html("<a class='btn btn-primary btn-new' href={{ url_for('aluno.new') }}><i class='material-icons md-light md-24'>add</i>Novo Cadastro</a>")
+    
+    </script>
+{% endblock %}

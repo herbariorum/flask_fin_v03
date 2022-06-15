@@ -10,6 +10,7 @@ from flask import (
     )
 from werkzeug.security import generate_password_hash
 from sqlalchemy.exc import SQLAlchemyError
+
 from .form import FormLogin, FormRegister
 from ..models import User
 from .. import db
@@ -76,24 +77,30 @@ def register():
     if request.method == 'POST' and form.validate():
         username = form.username.data
         email = form.email.data
-        password_hash = generate_password_hash(form.password_hash.data)
-        
+        password = form.password_hash.data
+        password_hash = generate_password_hash(password)
         try:
             user = User.query.filter_by(email=email).first()
             if user:
                 msg = "O Email já existe na base de dados"
                 tipo = 'warning'
+            error_message = User.check_password_strength_and_hash_if_ok(password)
+    
+            if len(error_message) > 0:
+                msg = error_message
+                tipo = 'warning'
             if msg is None:
                 user = User(
-                    username = username,
-                    email = email,
-                    password_hash = password_hash
-                )
+                        username = username,
+                        email = email,
+                        password_hash = password_hash
+                    )
                 db.session.add(user)
                 db.session.commit()
                 msg = 'Usuário cadastrado com sucesso'
-                tipo = 'success'
-                return redirect(url_for('admin.painel'))
+                tipo = 'success'    
+                flash(msg, tipo) 
+                return redirect(url_for('admin.painel'))            
         except SQLAlchemyError as e:
             msg = "Não foi possível cadastrar o novo usuário.\n O seguinte erro ocorreu: {}".format(e)
             tipo = 'error'
@@ -105,10 +112,6 @@ def register():
 def logout():
     session.clear()
     return redirect(url_for('auth.login'))
-
-@auth.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
 
 def gera_hash(password):
     return generate_password_hash(password)

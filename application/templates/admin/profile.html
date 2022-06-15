@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('admin.painel')}}">Admin</a>/Perfil
+{% endblock %}
+
+{% block page %}  
+<div class="col-md-6 offset-md-3">
+    <span class="material-icons account offset-md-5">how_to_reg</span>
+    <form class="row g-3 needs-validation" method="post" novalidate>
+        {{form.csrf_token() }}
+        {{ render_field_required(form.username, 'mb-3',class='form-control')}}
+        {{ render_field_required(form.email, 'mb-3',class='form-control')}}
+        {{ render_field_required(form.password_hash, 'col-md-6',class='form-control')}}
+        {{ render_field_required(form.confirm, 'col-md-6',class='form-control')}}
+        <div class="mb-3">
+            {{ form.submit(class='btn btn-success')}}
+        </div>  
+    </form>
+</div>
+    
+{% endblock %}

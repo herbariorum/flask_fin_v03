@@ -45,6 +45,9 @@
                 <li>
                     <a href="{{ url_for('admin.responsavel')}}"><i class="material-icons">supervisor_account</i><span>Responsável</span></a>
                 </li>
+                <!-- <li>
+                    <a href="{{ url_for('auth.register')}}"><i class="material-icons">how_to_reg</i><span>Cadastrar Usuário</span></a>
+                </li> -->
                 <li>
                     <a href="{{ url_for('auth.logout')}}"><i class="material-icons">logout</i><span>Sair</span></a>
                 </li>
@@ -82,6 +85,6 @@
 <script>
     setTimeout(function(){
         $(".alert").hide()
-    }, 2000);
+    }, 3000);
 </script>
 {% endblock%}

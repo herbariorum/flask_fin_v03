@@ -1,0 +1,268 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required, render_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aluno.css')}}">
+{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('aluno.index')}}">Aluno</a>/Cadastro
+{% endblock %}
+
+
+{% block page %}  
+<div class="col-md-12 ">
+    <form class="needs-validation row g-3  align-items-center" method="post" novalidate>
+        {{form.csrf_token() }}
+        <fieldset class="form-group border p-3 row">
+            {{ render_field_required(form.nome, 'col-sm-6',class='form-control form-control-sm')}}
+            {{ render_field_required(form.cpf, 'col-sm-3',class='form-control form-control-sm')}}
+            {{ render_field(form.sexo, 'col-sm-3',class='form-control form-control-sm')}}
+            {{ render_field(form.nascimento, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.rg, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.orgao_exp_rg, 'col-md-6',class='form-control form-control-sm')}}
+            {{ render_field(form.uf_exp_rg, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.uf_naturalidade, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.naturalidade,  'col-md-6', class='form-control form-control-sm')}}
+            {{ render_field(form.nacionalidade, 'col-md-4',class='form-control form-control-sm')}}
+            {{ render_field(form.pai, 'col-sm-4',class='form-control form-control-sm')}}
+            <div class="col-sm-2 ">      
+                <!-- <a href="{{ url_for('aluno.search_responsavel', tipo='pai') }}" class="form-control form-control-sm btn btn-primary btn-search-pai"><span class="material-icons">baby_changing_station</span>Busca Pai...</a> -->
+                <button id="btnPai" type="button" class="form-control from-control-sm btn btn-primary btn-search-pai" data-bs-toggle="modal" data-bs-target="#formPesquisa"><span class="material-icons">baby_changing_station</span>Buscar...</button>
+            </div>        
+            {{ render_field(form.mae, 'col-sm-4',class='form-control form-control-sm')}}
+            <div class="col-sm-2 ">            
+                <!-- <a href="{{ url_for('aluno.search_responsavel', tipo='mae') }}" class="form-control form-control-sm btn btn-primary btn-search-mae"><span class="material-icons">pregnant_woman</span>Busca Mae...</a> -->
+                <button id="btnMae" type="button" class="form-control from-control-sm btn btn-primary btn-search-mae" data-bs-toggle="modal" data-bs-target="#formPesquisa"><span class="material-icons">pregnant_woman</span>Buscar...</button>
+            </div>
+            {{ render_field(form.endereco, 'col-md-12',class='form-control form-control-sm')}}
+            {{ render_field(form.bairro, 'col-md-6',class='form-control form-control-sm')}}
+            {{ render_field(form.uf, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.cidade, 'col-md-4',class='form-control form-control-sm')}}
+        </fieldset>
+        
+        <fieldset class="form-group border p-3 row">
+            <div class="row g-3 col-md-4">
+                <select name="tipo_certidao" id="tipo_certidao" class="form-select form-control-sm">
+                    <option value="0">Selecione o tipo de certidão</option>
+                    <option value="1">Modelo Novo</option>
+                    <option value="2">Modelo Antigo</option>
+                </select>
+            </div>
+            <div class="row g-3" id="fcertidao">
+            {{ render_field(form.certidao_nascimento, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.termo_certidao_nasc, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.folha_certidao_nasc, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.livro_certidao_nasc, 'col-md-2',class='form-control form-control-sm')}}
+            {{ render_field(form.data_emissao_certidao, 'col-md-4',class='form-control form-control-sm')}}
+            </div>
+            <div class="row g-3" id="fmatricula">
+                {{ render_field(form.matricula, 'col-md-12',class='form-control form-control-sm')}}
+            </div>
+            
+        </fieldset>        
+
+        <div class="mb-3">
+            {{ form.submit(class='btn btn-success')}}
+        </div>  
+
+    </form>
+</div>
+
+<!-- Form Modal BuscaPai -->
+<div class="modal fade" id="formPesquisa" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Pesquisa por pais ou responsável</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="">
+                    <table class="tabela table">
+                        <tbody>
+                            <tr>
+                                <td colspan="2">
+                                    <fieldset>
+                                        <legend>
+                                            <b>Buscar por Pais/Responsável</b>
+                                        </legend>
+                                        <table class="tabela" width="700" border="0" align="center">
+                                            <tbody>
+                                                <tr>
+                                                    <td id="tipo_resp" hidden></td>
+                                                    <td align="center">Nome</td>
+                                                    <td><input type="text" name="nome_busca" id="nome_busca" class='form-control form-control-sm'></td>
+                                                    <td><input type="button" class="btn btn-secondary form-control-sm" id="btnPesquisa" value="Pesquisar" name="Pesquisa"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </fieldset>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>                
+                <table class="tabela table">
+                    <tbody>
+                        <tr>
+                            <td colspan="2">
+                                <fieldset>
+                                    <legend>
+                                        <b>Resultado da Consulta</b>
+                                    </legend>
+                                    <table class="tabela" width="700" border="0" align="center">
+                                        <tbody id="data-update">                                            
+                                        </tbody>
+                                    </table>
+                                </fieldset>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/jquery.mask.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <script>
+        // formata o cpf
+        $(document).ready(function(){
+            $('#cpf').mask('000.000.000-00');
+        });
+        // busca cidades
+        $('#uf').on('change', function(e) {
+            var uf = this.value
+            $.ajax({
+                url: "{{ url_for('aluno.list_cities')}}",
+                data: {'uf': uf},
+                method: 'GET',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success: function(obj){                    
+                    if (obj != null){   
+                        var option = '';                     
+                        var selectbox = $('#cidade');
+                        selectbox.find('option').remove();                                
+                        $.each(obj, function(key, value){                            
+                            option += '<option value="'+key+'">'+value+'</option>';
+                        });
+                        selectbox.html(option).show();
+                    }
+                }
+            
+
+            });
+        });
+        $('#uf_naturalidade').on('change', function(e){
+            var uf = this.value
+            $.ajax({
+                url: "{{ url_for('aluno.list_cities')}}",
+                data: {'uf': uf},
+                method: 'GET',
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success: function(obj){
+                    if (obj != null){
+                        var option = '';
+                        var selectbox = $('#naturalidade');
+                
+                        $.each(obj, function(key, value){                            
+                            option += '<option value="'+key+'">'+value+'</option>';
+                        });
+                        selectbox.html(option).show();
+                    }
+                }
+            });
+        });
+
+        
+        $(document).ready(function(){
+            $('#matricula').mask('000000.00.00.0000.0.00000.000.0000000.99');
+        });
+
+        $("#fcertidao").hide()
+        $("#fmatricula").hide()
+
+        $('#tipo_certidao').on('change', function(event){
+            var tipo = event.currentTarget.value;
+            if (tipo == 0){
+                $("#fcertidao").hide()
+                $("#fmatricula").hide()
+            }
+            if (tipo == 1) {
+                $("#fcertidao").hide();
+                $("#fmatricula").show()
+            }
+            if (tipo == 2) {
+                $("#fmatricula").hide()
+                $("#fcertidao").show()
+            }
+
+        });
+
+        $(document).on("click", "#btnPai", function(){
+            $("#tipo_resp").html(0)
+        });
+
+        $(document).on("click", "#btnMae", function(){
+            $("#tipo_resp").html(1)
+        });
+        // A clicar no botão pesquisar
+        // faço a busca pelo termo, no caso, o nome
+        // e preencho a tabela
+        $(document).on('click', '#btnPesquisa', function(){
+            var termo = $('#nome_busca').val().trim()
+            var tipo = $('#tipo_resp').text()
+            var tabela = $('#data-update')
+            
+            var data = [termo, tipo]
+            if (!termo){
+                alert('Digite um termo para pesquisa.')
+                return false
+            } else {
+                $.ajax({
+                    url: "{{ url_for('aluno.search_responsavel') }}",
+                    data: JSON.stringify(data),
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function(result){
+                        var tbl_row = '';
+                        if (result !== null){
+                            for (var i=0; i < result.Data.length; i++){
+                                tbl_row += '<td>' + result.Data[i].id + '</td>'
+                                tbl_row += '<td><a href="#" class="link-primary">' + result.Data[i].nome + '</a></td>'
+                                tbl_row += '<td>' + result.Data[i].cpf + '</td>'
+                            }
+
+                            tabela.html(tbl_row);
+                            
+                        } else{
+                            tabela.html('<td colspan=3>Pesquisa não resultou registro</td>')                        
+                        }                        
+                    },
+                    error: function(){
+                        alert('Erro ao carregar os dados');
+                    }
+                });
+            }
+        });
+        // Ao sair do formulário, limpo a tabela
+        // e o input
+        $(document).on('hidden.bs.modal', function(){
+            $('#data-update').html("");  
+            $('#nome_busca').val('')          
+        });
+    </script>
+{% endblock %}

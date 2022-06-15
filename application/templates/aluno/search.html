@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required, render_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aluno.css')}}">
+{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('aluno.index')}}">Aluno</a>/Search
+{% endblock %}
+
+
+{% block page %}
+<form class="needs-validation row g-3  align-items-center" method="post" novalidate>
+    {{form.csrf_token() }}
+    <fieldset class="form-group border p-3 row" style="display: flex; justify-content:center;">
+        <div class="row g-3 col-md-4">
+        {{ render_field(form.termo, 'col-sm-12',class='form-control form-control-sm')}}
+        <div class="mb-3">
+            {{ form.submit(class='btn btn-success')}}
+            <input type="button" onclick="history.back();" value="Voltar" class="btn btn-outline-primary">
+        </div>  
+    </div>
+    </fieldset>
+</form>
+
+{% if results %}
+    <table class="table">
+        <thead>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>CPF</th>
+        </thead>    
+    {% for row in results %}
+        <tr>
+            <td>{{ row.id}}</td>
+            {% if row.tipo_responsavel == 0 %}
+                <td><a href="{{ url_for('aluno.new', id_pai=row.id, nome_pai=row.nome) }}"> {{ row.nome}}</a></td>
+            {% elif row.tipo_responsavel == 1 %}
+            <td><a href="{{ url_for('aluno.new', id_mae=row.id, nome_mae=row.nome) }}"> {{ row.nome}}</a></td>
+            {% endif %}
+            <td>{{ row.cpf}}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% else %}
+    <div class="row p-3">
+        <div class="row g-3 col-md-4">
+        <p>Não existe registros pesquisados</p>
+        </div>
+    </div>
+    
+{% endif %}
+
+{% endblock %}
