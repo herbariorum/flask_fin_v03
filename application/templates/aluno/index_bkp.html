@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aluno.css')}}">
+<style>
+    table.table td span {
+        font-size: 19px;
+    }
+    table.table td a {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('admin.painel')}}">Admin</a>/Aluno
+{% endblock %}
+
+
+{% block page %}
+<!-- https://www.tutorialrepublic.com/snippets/preview.php?topic=bootstrap&file=data-table-with-search-box -->
+<div class="table-responsive">
+    <div class="table-wrapper">       
+        <table id="data" class="table table-hover m-table--head-bg-primary">
+            <thead>
+                <tr class="bg-info text-light">
+                    <th>ID</th>
+                    <th>NOME</th>
+                    <th>CPF</th>
+                    <th>DATA NASCIMENTO</th>
+                    <th class="text-center">AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td >{{row.id}}</td>
+                        <td> <strong>{{row.nome|title}}</strong></td>
+                        <td>{{ row.cpf|cpffilter }}</td>
+                        <td>{{ row.nascimento.strftime('%d/%m/%Y') }}</td>
+                        <td style="display: flex; justify-content: center;">
+                            <div class="p-2 icons">
+                                <a class="view" href="{{ url_for('aluno.view', id=row.id)}}">
+                                    <span class="material-icons text-info" data-bs-toggle="tooltip" title="Visualizar">visibility</span>
+                                </a>
+                                <a class="edit" href="#" >
+                                    <span class="material-icons text-warning" data-bs-toggle="tooltip" title="Clique para editar">edit</span>
+                                </a>
+                                <a href="#" id="btn_table_delete" onclick="remove(this)"">
+                                    <span class="material-icons text-danger" data-bs-toggle="tooltip" title="Clique para deletar">delete</span>
+                                </a>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>  
+    
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
+
+    <script>
+        $('#data').DataTable({
+            rowReorder: true,
+            columnDefs: [
+                { orderable: true, className: 'reorder', targets: 0 }, //permite ordenar a coluna 0
+                { orderable: true, className: 'reorder', targets: 1 },
+                { orderable: false, targets: '_all' },  // desativa ordenar coluna em todas as outras
+                {
+                    target:3,
+                    searchable: false,
+                },
+                {
+                    target:4,
+                    searchable: false,
+                },
+            
+                {
+                    target:0,
+                    width: 10
+                }
+            ],
+            dom: '<"toolbar">frtip'
+        }); // FIM DATATABLE
+
+        $('div.toolbar').html("<a class='btn btn-primary btn-new' href={{ url_for('aluno.new') }}><i class='material-icons md-light md-24'>add</i>Novo Cadastro</a>")
+
+        function remove(e){
+            // var id = $('.id_delete').text();
+            const tr = $(e).closest("tr");
+            var id = tr.find("td:eq(0)").text().trim();
+                
+            fetch("/aluno/"+id+"/delete", {method: 'POST',})
+                .then(response => response.json()
+                    .then(data => {
+                        if (data['result']== 'success'){
+                            alert('Registro removido com sucesso');
+                           
+                            tr.fadeOut(400, () =>{
+                               tr.remove();
+                            })
+                            return false;
+                        } else if (data['result']== 'error'){
+                            alert('Não foi possível excluir o registro.');       
+                                  
+                            return false;                  
+                        }
+                    })
+                );
+
+            return false;              
+        }  
+    </script>
+{% endblock %}

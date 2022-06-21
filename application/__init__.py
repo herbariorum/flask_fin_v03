@@ -3,6 +3,10 @@
 from flask import Flask, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_marshmallow import Marshmallow
+import urllib
+from markupsafe import Markup
+
 
 from .filter.filter import cpffilter, format_strit_to_data
 
@@ -15,6 +19,7 @@ def method_not_allowed(e):
 
 db = SQLAlchemy()
 mg = Migrate()
+ma = Marshmallow()
 
 def create_app():
     app = Flask(__name__, static_folder='static', template_folder='templates')
@@ -22,10 +27,18 @@ def create_app():
 
     app.add_template_filter(cpffilter)
     app.add_template_filter(format_strit_to_data)
+    @app.template_filter('urlencode')
+    def urlencode_filter(s):        
+        if type(s) == 'Markup':
+            s = s.unescape()
+        s = s.encode('utf8')
+        s = urllib.parse.quote_plus(s)
+        return Markup(s)
 
     db.init_app(app)
     mg.init_app(app, db)
-
+    ma.init_app(app)
+    
     from application.admin.views import admin
     from application.auth.views import auth
     from application.aluno.views import aluno

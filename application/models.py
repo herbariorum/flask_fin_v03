@@ -1,8 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import re
-from application import db
-import json
+from application import db, ma
 
 
 
@@ -13,8 +12,8 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     username = db.Column(db.String(40), unique=True, nullable=True)
     password_hash = db.Column(db.String(128))
-    created_on = db.Column(db.Date, default=datetime.date.today())
-    updated_on = db.Column(db.Date)
+    created_at = db.Column(db.Date, default=datetime.date.today())
+    modified_at = db.Column(db.Date)
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -42,34 +41,37 @@ class Aluno(db.Model):
     photo = db.Column(db.String(100))
     nome = db.Column(db.String(80), nullable=False)
     cpf = db.Column(db.String(11), unique=True)
+
     rg = db.Column(db.String(15))
     orgao_exp_rg = db.Column(db.String(15))
     uf_exp_rg = db.Column(db.String(2))
+
     nascimento = db.Column(db.Date, nullable=False)
     sexo = db.Column(db.Integer)
-    pai = db.Column(db.Integer)
-    mae = db.Column(db.Integer)
+    pai = db.Column(db.String(80))
+    mae = db.Column(db.String(80))
+
     endereco = db.Column(db.String(255))
     bairro = db.Column(db.String(80))
-    cidade = db.Column(db.String(8))
+    cidade = db.Column(db.String(20))
     uf = db.Column(db.String(2))
     
     uf_naturalidade = db.Column(db.String(2))
     naturalidade = db.Column(db.String(30))
     nacionalidade = db.Column(db.String(20))
+
     certidao_nascimento = db.Column(db.String(10))
     termo_certidao_nasc = db.Column(db.String(10))
     folha_certidao_nasc = db.Column(db.String(10))
     livro_certidao_nasc = db.Column(db.String(10))
     data_emissao_certidao = db.Column(db.Date)
-    # cartorio_certidao = db.Column(db.String(30))
 
     matricula = db.Column(db.String(32))
 
     status = db.Column(db.SmallInteger(), default=1)
 
-    created_on = db.Column(db.Date, default=datetime.date.today())
-    updated_on = db.Column(db.Date)
+    created_at = db.Column(db.Date, default=datetime.date.today())
+    modified_at = db.Column(db.Date)
 
 
 class Responsavel(db.Model):
@@ -85,7 +87,22 @@ class Responsavel(db.Model):
     contato = db.Column(db.String(11))
     endereco = db.Column(db.String(255))
     status = db.Column(db.SmallInteger(), default=1)
-    created_on = db.Column(db.Date, default=datetime.date.today())
-    updated_on = db.Column(db.Date)
+    created_at = db.Column(db.Date, default=datetime.date.today())
+    modified_at = db.Column(db.Date)
+
+# Class usadas na pesquisa por responsavel do aluno
+class ResponsavelSchema(ma.Schema):
+    class Meta:
+        fields = ("id", "nome", "cpf", "tipo_responsavel")
+
+responsavel_schema = ResponsavelSchema()
+responsaveis_schema = ResponsavelSchema(many=True)
 
 
+# Classe auxiliar
+class Cidades(db.Model):
+    __tablename__ = 'cidades_tables'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    uf = db.Column(db.String)
+    nome = db.Column(db.String)

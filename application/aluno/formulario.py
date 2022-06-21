@@ -1,12 +1,39 @@
+from email.policy import default
 from flask import session
 import wtforms
-from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional
 from flask_wtf import FlaskForm
-from wtforms.csrf.session import SessionCSRF
 from datetime import timedelta
-from config import SECRET_KEY
-from pyUFbr.baseuf import ufbr
 
+estados = [
+        ('AC', 'ACRE'),
+        ('AL', 'ALAGOAS'),
+        ("AM", "AMAZONAS"),
+        ("AP", "AMAPÁ"),
+        ("BA", "BAHIA"),
+        ("CE", "CEARÁ"),
+        ("DF", "DISTRITO FEDERAL"),
+        ("ES", "ESPIRITO SANTO"),
+        ("GO", "GOIÁS"),
+        ("MA", "MARANHÃO"),
+        ("MG", "MINAS GERAIS"),
+        ("MS", "MATO GROSSO DO SUL"),
+        ("MT", "MATO GROSSO"),
+        ("PA", "PARÁ"),
+        ("PB", "PARAÍBA"),
+        ("PE", "PERNAMBUCO"),
+        ("PI", "PIAUI"),
+        ("PR", "PARANÁ"),
+        ("RJ", "RIO DE JANEIRO"),
+        ("RN", "RIO GRANDE DO NORTE"),
+        ("RO", "RONDÔNIA"),
+        ("RR", "RORAIMA"),
+        ("RS", "RIO GRANDE DO SUL"),
+        ("SC", "SANTA CATARINA"),
+        ("SP", "SÃO PAULO"),
+        ("SE", "SERGIPE"),
+        ("TO", "TOCANTINS")
+        ]
 
 class FormAluno(FlaskForm):   
 
@@ -16,15 +43,15 @@ class FormAluno(FlaskForm):
     orgao_exp_rg = wtforms.StringField('Órgão Emissor RG')
     uf_exp_rg = wtforms.SelectField(
         'UF',
-        choices=ufbr.list_uf
+        choices= estados, coerce=str, validate_choice=False
     )
-    nascimento = wtforms.DateField('Data Nascimento', validators=[DataRequired(message="O campo é requerido")])
+    nascimento = wtforms.DateField('Data Nascimento')
     sexo = wtforms.SelectField(
         'Sexo',
         choices=(
             (0, 'Masculino'),
             (1, 'Feminino')
-        ), coerce=int
+        ), coerce=int, validate_choice=False
     )
     pai = wtforms.StringField('Nome do Pai/Responsável', render_kw={'readonly': 'readonly'})
     mae = wtforms.StringField('Nome da Mãe/Responsável', render_kw={'readonly': 'readonly'})
@@ -33,15 +60,15 @@ class FormAluno(FlaskForm):
     bairro = wtforms.StringField('Bairro')    
     uf = wtforms.SelectField(
         'UF',
-        choices=ufbr.list_uf
+        choices=estados, validate_choice=False
     )
-    cidade = wtforms.SelectField('Cidade')
+    cidade = wtforms.SelectField('Cidade', choices=[], validate_choice=False)
 
     uf_naturalidade = wtforms.SelectField(
         'UF',
-        choices=ufbr.list_uf
+        choices=estados, validate_choice=False
     )
-    naturalidade = wtforms.SelectField('Naturalidade')
+    naturalidade = wtforms.SelectField('Naturalidade', choices=[], validate_choice=False)
     nacionalidade = wtforms.StringField('Nacionalidade')
 
     certidao_nascimento = wtforms.StringField('Certidão')
@@ -59,3 +86,9 @@ class FormAluno(FlaskForm):
 class FormSearch(FlaskForm):
     termo = wtforms.StringField('Termo para pesquisa', validators=[DataRequired(message="O campo é requerido")])
     submit = wtforms.SubmitField('Pesquisar')
+
+# class FormCidade(FlaskForm):
+#     uf = wtforms.SelectField('UF', choices= estados)
+
+#     nome = wtforms.SelectField('Cidade', choices= [])
+#     submit = wtforms.SubmitField('Submit')

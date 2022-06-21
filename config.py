@@ -16,7 +16,7 @@ SQLALCHEMY_DATABASE_URI = 'sqlite:///../finance.db'
 
 SQLALCHEMY_ECHO = True
 
-POSTS_PER_PAGE = 3
+PER_PAGE = 4
 
 # Uploads
 UPLOADS_DEFAULT_DEST = TOP_LEVEL_DIR + '/application/static/uploads/'

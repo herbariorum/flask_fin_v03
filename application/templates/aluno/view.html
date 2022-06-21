@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required, render_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aluno.css')}}">
+{% endblock %}
+
+{% block breadcrumb %}
+<div class="noPrint">
+    <a href="{{ url_for('aluno.index')}}">Aluno</a>/View
+</div>
+
+{% endblock %}
+
+
+{% block page %}
+<div class="title" style="display: flex; margin-bottom: 10px;">
+    <h3 class="lead" style="display: flex; justify-content: flex-start; order: 0">Informações do(a) Aluno(a): {{ row.nome }}</h3>
+    <div class="noPrint">
+        <button class="btn btn-light" onclick="window.print();" style="display: flex; justify-content: flex-end; order: 1; margin-left: 25px;">
+            <span class="material-icons">print</span>
+        </button>
+    </div>
+    
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th rowspan="3" class="text-center" style="width: 20%; vertical-align: middle;  ">
+                {% if row.photo %}
+                <img src="{{ url_for('static', filename=row.photo )}}" width="128" height="128" alt="">
+                {% else %}
+                <img src="{{ url_for('static', filename='uploads/sample.jpg' )}}" width="128" height="128" alt="">
+                {% endif %}
+
+            </th>
+            <th colspan="2">Nome do Aluno: <small class="text-muted" style="padding-right: 20px;"> {{ row.nome }}</small>
+                Data Nascimento: <small class="text-muted" style="padding-right: 20px;">
+                    {{ row.nascimento }}
+                </small>
+                Sexo: <small class="text-muted"> {% if row.sexo == 0 %}
+                    Masculino
+                {% else %}
+                    Feminino
+                {% endif %}</small>
+            </th>            
+        </tr>
+        <tr>
+            <th colspan="2">CPF: <small class="text-muted">{{ row.cpf|cpffilter or ' não cadastrado'}}</small></th>            
+        </tr>
+        <tr>
+            <th  colspan="2">RG: <small class="text-muted" style="padding-right: 20px;"> {{row.rg or ' não cadastrado'}}</small>
+                Órgão Expedidor: <small class="text-muted" style="padding-right: 20px;"> {{row.orgao_exp_rg or ' não cadastrado'}}</small>   
+                UF do Órgão Expedidor: <small class="text-muted" style="padding-right: 20px;"> {{row.uf_exp_rg or ' não cadastrado'}}</small>
+            </th>
+        </tr>
+        <tr> 
+            <tr>
+                <th style="width: 25%">Naturalidade: <small class="text-muted">{{ row.naturalidade or ' não cadastrado'}}</small></th>
+                <th>UF: <small class="text-muted">{{ row.uf_naturalidade or ' não cadastrado'}}</small></th>
+                <th>Nacionalidade: <small class="text-muted">{{ row.nacionalidade or ' não cadastrado'}}</small></th>
+            </tr>
+        
+        </tr>
+        <tr>           
+            <th colspan="3">Endereço do Aluno: <small class="text-muted">{{ row.endereco or ' não cadastrado'}}</small></th>
+        </tr>
+        <tr> 
+            <tr>
+                <th>Bairro: <small class="text-muted">{{ row.bairro or ' não cadastrado'}}</small></th>
+                <th>Cidade: <small class="text-muted">{{ row.cidade or ' não cadastrado'}}</small></th>
+                <th>Estado: <small class="text-muted">{{ row.uf or ' não cadastrado'}}</small></th>
+            </tr>
+        </tr>
+        <tr>
+            <th colspan="3"></th>
+        </tr>
+        <tr>    
+            <tr>
+                <th colspan="2">Pai: <small class="text-muted">{{ row.pai or ' não cadastrado'}}</small></th>
+                <th>Mae: <small class="text-muted">{{ row.mae or ' não cadastrado'}}</small></th>
+            </tr>  
+        </tr>
+        <tr>
+            <th colspan="3"></th>
+        </tr>
+        {% if row.matricula is none %}
+        <tr> 
+            <tr>
+                <th>Certidão de Nasc.: <small class="text-muted">{{ row.certidao_nascimento or ' não cadastrado'}}</small></th>
+                <th>Termo: <small class="text-muted">{{ row.termo_certidao_nasc or ' não cadastrado'}}</small></th>
+                <th>Folha: <small class="text-muted">{{ row.folha_certidao_nasc or ' não cadastrado'}}</small></th>
+            </tr>
+        </tr>
+        <tr> 
+            <tr>
+                <th>Livro: <small class="text-muted">{{ row.livro_certidao_nasc or ' não cadastrado'}}</small></th>
+                <th>Data: <small class="text-muted">{{ row.data_emissao_certidao or ' não cadastrado'}}</small></th>
+                <th>Cartório: <small class="text-muted">{{ row.cartorio_certidao or ' não cadastrado'}}</small></th>
+            </tr>
+        </tr>
+        {% else %}
+        <tr>
+            <th colspan="3">{{ row.matricula}}</th>
+        </tr>
+        {% endif %}
+        
+    </thead>
+</table>
+{% endblock %}

@@ -1,12 +1,11 @@
 {% extends "layout.html" %}
-{% from "_formhelper.html" import render_field_required %}
+{% from "_pagination.html" import render_pagination %}
 
 {% block title %}{{ title }}{% endblock %}
 
 {% block head %}
 {{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css')}}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/aluno.css')}}">
+
 {% endblock %}
 
 {% block breadcrumb %}
@@ -14,63 +13,90 @@
 {% endblock %}
 
 
-{% block page %}  
-    <table id="data" class="table table-hover">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>NOME</th>
-                <th>CPF</th>
-                <th>DATA NASCIMENTO</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in rows %}
-                <tr>
-                    <td>{{row.id}}</td>
-                    <td><a href="{{ url_for('aluno.view', id=row.id)}}">{{row.nome|title}}</a></td>
-                    <td>{{ row.cpf }}</td>
-                    <td>{{ row.nascimento.strftime('%d/%m/%Y') }}</td>
-                    <td></td>
+{% block page_content %}
+<div class="table-responsive">
+    <div class="table-wrapper">
+        <div class="table-title">
+            <div class="row">
+                <div class="col-sm-8">
+                    <div class="input-group mb-3">
+                        <a href={{ url_for('aluno.new') }} class="btn btn-success d-flex justify-content-center align-content-between" >
+                            <i class="material-icons mr-1" style="padding-top: 2px;">add_circle_outline</i>
+                            <span>Adiciona Aluno</span>
+                        </a>
+                    </div>
+                    
+                </div> 
+                <div class="col-sm-4 d-grip d-md-flex">
+                    <form class="input-group mb-3" method="post">
+                        <input name="termo-busca" type="text" class="form-control" placeholder="Pesquisar&hellip;"  aria-describedby="button-addon">            
+                        <input class="btn btn-outline-primary" name="submit" type="submit" id="button-addon" value="Buscar">
+                        
+                    </form>
+                    
+                </div>
+              
+            </div> 
+        </div>
+        <table class="table table-striped table-hover table-bordered" id="tabela">
+            <thead>
+                <tr class="bg-info text-light">
+                    <th>ID</th>
+                    <th>NOME</th>
+                    <th>CPF</th>
+                    <th>DATA NASCIMENTO</th>
+                    <th class="text-center">AÇÕES</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
+            </thead>
+            <tbody">
+                {% for row in rows.items %}
+                    <tr>
+                        <td >{{row.id}}</td>
+                        <td> <strong>{{row.nome|title}}</strong></td>
+                        <td>{{ row.cpf|cpffilter }}</td>
+                        <td>{{ row.nascimento.strftime('%d/%m/%Y') }}</td>
+                        <td style="display: flex; justify-content: center;">
+                            <div class="p-2 icons">
+                                <a class="view" href="{{ url_for('aluno.view', id=row.id)}}">
+                                    <span class="material-icons text-info" data-bs-toggle="tooltip" title="Visualizar">visibility</span>
+                                </a>
+                                <a class="edit" href="#" >
+                                    <span class="material-icons text-warning" data-bs-toggle="tooltip" title="Clique para editar">edit</span>
+                                </a>
+                                <a href="#" id="btn_table_delete" onclick="remove(this)"">
+                                    <span class="material-icons text-danger" data-bs-toggle="tooltip" title="Clique para deletar">delete</span>
+                                </a>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="clearfix" id="hints">
+            <div class="hint-text">Mostrando <b>{{ rows.items|length }}</b> registros de um total de <b>{{ rows.total }}</b></div>                      
+            {{render_pagination(rows, 'aluno.index')}}
+        </div>
+
+    </div>
+</div>
 {% endblock %}
 
 {% block script %}
     {{ super() }}
-    <script src="{{ url_for('static', filename='js/jquery.dataTables.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/dataTables.buttons.min.js')}}"></script>
-    <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
+    <!-- <script>
+        let input = document.getElementById('pesquisa');
+        input.onkeydown = input.onkeyup  = function(){
+            termo = input.value;
+            if (termo !== ''){
+                tabela = document.getElementById('tabela');
+                bottom_table = document.getElementById('hints')
 
-    <script>
-        $('#data').DataTable({
-            rowReorder: true,
-            columnDefs: [
-                { orderable: true, className: 'reorder', targets: 0 }, //permite ordenar a coluna 0
-                { orderable: true, className: 'reorder', targets: 1 },
-                { orderable: false, targets: '_all' },  // desativa ordenar coluna em todas as outras
-                {
-                    target:3,
-                    searchable: false,
-                },
-                {
-                    target:4,
-                    searchable: false,
-                },
-            
-                {
-                    target:0,
-                    width: 10
-                }
-            ],
-            dom: '<"toolbar">frtip'
-        }); // FIM DATATABLE
+                tabela.innerHTML = '';
+                bottom_table.innerHTML = '';
 
-        $('div.toolbar').html("<a class='btn btn-primary btn-new' href={{ url_for('aluno.new') }}><i class='material-icons md-light md-24'>add</i>Novo Cadastro</a>")
-    
-    </script>
+            }       
+        }
+
+    </script> -->
 {% endblock %}

@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% from "_formhelper.html" import render_field_required, render_field %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/datatables.min.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/aluno.css')}}">
+{% endblock %}
+
+{% block breadcrumb %}
+<a href="{{ url_for('aluno.index')}}">Aluno</a>/Cadastro
+{% endblock %}
+
+
+{% block page %} 
+<div class="col-md-12 ">
+    <form class="needs-validation row g-3  align-items-center" method="post" novalidate>
+        {{form.csrf_token }}
+        <fieldset class="form-group border p-3 row">
+            {{ form.uf }}
+            {{ form.nome }}
+            {{ form.submit }}
+        </fieldset>
+    </form>
+</div>
+{% endblock %}
+
+{% block script %}
+    {{ super() }}
+    <script>
+        let uf_select = document.getElementById('uf')
+        let cidade_select = document.getElementById('nome')
+        uf_select.onchange = function(){
+            estado = uf_select.value;
+
+            fetch("/aluno/cidade/"+estado)
+                .then(response => response.json()
+                .then(data => {
+                    let optionHTML = '';
+
+                    for (let cidade of data.cidades){
+                        optionHTML += '<option value="' + cidade.id + '">'+ cidade.nome + '</option>';
+                    }
+
+                    cidade_select.innerHTML = optionHTML;
+                })
+                );
+        }
+
+    </script>
+
+    
+
+{% endblock %}

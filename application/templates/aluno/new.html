@@ -14,7 +14,7 @@
 {% endblock %}
 
 
-{% block page %}  
+{% block page_content %}  
 <div class="col-md-12 ">
     <form class="needs-validation row g-3  align-items-center" method="post" novalidate>
         {{form.csrf_token() }}
@@ -115,7 +115,7 @@
                                     <legend>
                                         <b>Resultado da Consulta</b>
                                     </legend>
-                                    <table class="tabela" width="700" border="0" align="center">
+                                    <table class="table table-striped" width="700" border="0" align="center">
                                         <tbody id="data-update">                                            
                                         </tbody>
                                     </table>
@@ -141,51 +141,89 @@
         $(document).ready(function(){
             $('#cpf').mask('000.000.000-00');
         });
-        // busca cidades
-        $('#uf').on('change', function(e) {
-            var uf = this.value
-            $.ajax({
-                url: "{{ url_for('aluno.list_cities')}}",
-                data: {'uf': uf},
-                method: 'GET',
-                dataType: 'json',
-                contentType: "application/json; charset=utf-8",
-                success: function(obj){                    
-                    if (obj != null){   
-                        var option = '';                     
-                        var selectbox = $('#cidade');
-                        selectbox.find('option').remove();                                
-                        $.each(obj, function(key, value){                            
-                            option += '<option value="'+key+'">'+value+'</option>';
-                        });
-                        selectbox.html(option).show();
+        $('#uf_exp_rg').val('TO');
+        $('#uf_naturalidade').val('TO');
+        $('#uf').val('TO');
+
+        //buscar cidades NATURALIDADE
+        let uf_naturalidade_select = document.getElementById('uf_naturalidade')
+        let naturalidade_select = document.getElementById('naturalidade')
+        uf_naturalidade_select.onchange = function(){
+            estado = uf_naturalidade_select.value;
+            fetch("/aluno/cidade/"+estado)
+                .then(response => response.json()
+                .then(data => {
+                    let optionHTML = '';
+                    for (let cidade of data.cidades){
+                        optionHTML += '<option value="'+cidade.id+'">'+cidade.nome+'</option>';
                     }
-                }
+                    naturalidade_select.innerHTML = optionHTML;
+                })
+                );
+        }
+
+        // busca cidades ENDEREÇO
+        let uf_select = document.getElementById('uf')
+        let cidade_select = document.getElementById('cidade')
+        uf_select.onchange = function(){
+            estado = uf_select.value;
+            fetch("/aluno/cidade/"+estado)
+                .then(response => response.json()
+                .then(data => {
+                    let optionHTML = '';
+                    for (let cidade of data.cidades){
+                        optionHTML += '<option value="'+cidade.id+'">'+cidade.nome+'</option>';
+                    }
+                    cidade_select.innerHTML = optionHTML;
+                })
+                );
+        }
+
+        // busca cidades
+        // $('#uf').on('change', function(e) {
+        //     var uf = this.value
+        //     $.ajax({
+        //         url: "{{ url_for('aluno.list_cities')}}",
+        //         data: {'uf': uf},
+        //         method: 'GET',
+        //         dataType: 'json',
+        //         contentType: "application/json; charset=utf-8",
+        //         success: function(obj){                    
+        //             if (obj != null){   
+        //                 var option = '';                     
+        //                 var selectbox = $('#cidade');
+        //                 selectbox.find('option').remove();                                
+        //                 $.each(obj, function(key, value){                            
+        //                     option += '<option value="'+key+'">'+value+'</option>';
+        //                 });
+        //                 selectbox.html(option).show();
+        //             }
+        //         }
             
 
-            });
-        });
-        $('#uf_naturalidade').on('change', function(e){
-            var uf = this.value
-            $.ajax({
-                url: "{{ url_for('aluno.list_cities')}}",
-                data: {'uf': uf},
-                method: 'GET',
-                dataType: 'json',
-                contentType: "application/json; charset=utf-8",
-                success: function(obj){
-                    if (obj != null){
-                        var option = '';
-                        var selectbox = $('#naturalidade');
+        //     });
+        // });
+        // $('#uf_naturalidade').on('change', function(e){
+        //     var uf = this.value
+        //     $.ajax({
+        //         url: "{{ url_for('aluno.list_cities')}}",
+        //         data: {'uf': uf},
+        //         method: 'GET',
+        //         dataType: 'json',
+        //         contentType: "application/json; charset=utf-8",
+        //         success: function(obj){
+        //             if (obj != null){
+        //                 var option = '';
+        //                 var selectbox = $('#naturalidade');
                 
-                        $.each(obj, function(key, value){                            
-                            option += '<option value="'+key+'">'+value+'</option>';
-                        });
-                        selectbox.html(option).show();
-                    }
-                }
-            });
-        });
+        //                 $.each(obj, function(key, value){                            
+        //                     option += '<option value="'+key+'">'+value+'</option>';
+        //                 });
+        //                 selectbox.html(option).show();
+        //             }
+        //         }
+        //     });
+        // });
 
         
         $(document).ready(function(){
@@ -239,17 +277,19 @@
                     contentType: 'application/json',
                     success: function(result){
                         var tbl_row = '';
-                        if (result !== null){
-                            for (var i=0; i < result.Data.length; i++){
-                                tbl_row += '<td>' + result.Data[i].id + '</td>'
-                                tbl_row += '<td><a href="#" class="link-primary">' + result.Data[i].nome + '</a></td>'
-                                tbl_row += '<td>' + result.Data[i].cpf + '</td>'
+                        if (result.length != 0){ 
+                            for (var i=0; i < result.length; i++){
+                                tbl_row += '<tr>'
+                                tbl_row += '<td>' + result[i].id + '</td>'
+                                tbl_row += '<td><a href="#" class="link-primary" onclick="retornaValor('+ result[i].id +',\'' + result[i].nome +'\','+ result[i].tipo_responsavel +')">' + result[i].nome + '</a></td>'
+                                tbl_row += '<td>' + result[i].cpf + '</td>'   
+                                tbl_row += '</tr>'                      
                             }
-
+            
                             tabela.html(tbl_row);
                             
                         } else{
-                            tabela.html('<td colspan=3>Pesquisa não resultou registro</td>')                        
+                            tabela.html('<td colspan=3>Nenhum registro encontrado</td>')                        
                         }                        
                     },
                     error: function(){
@@ -264,5 +304,18 @@
             $('#data-update').html("");  
             $('#nome_busca').val('')          
         });
+
+        // Joga os dados no input
+        function retornaValor(id, nome, tipo){
+            event.preventDefault();
+            if (tipo === 0){
+                $('#pai').val(nome)
+                $('#pai').attr('pai_id', id)
+            }else{
+                $('#mae').val(nome)
+                $('#mae').attr('mae_id', id)
+            } 
+            $('#formPesquisa').modal('toggle'); 
+        }
     </script>
 {% endblock %}
